@@ -51,5 +51,7 @@ joined_df <- left_join(blank_df,patient_characteristics, by="ID") %>%
                          EVID == 1 ~ DOSE)
          )
 
+# write-out 
+# write.table(joined_df, "simulation_df.csv", row.names = F)
 
 
