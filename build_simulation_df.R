@@ -20,6 +20,7 @@ hist(patient_characteristics$HIV)
 
 table(patient_characteristics$SEX )
 table(patient_characteristics$HIV )
+table(patient_characteristics$DOSE, patient_characteristics$HIV)
 
 # create blank observation rows (EVID==0) for each patient (6 obs per patient at 1,2,4,8,12,24 hours post-dose)
 df <- data.frame(ID    = rep(seq(1,900),6),
@@ -52,6 +53,7 @@ joined_df <- left_join(blank_df,patient_characteristics, by="ID") %>%
          )
 
 # write-out 
-# write.table(joined_df, "simulation_df.csv", row.names = F)
+# write.table(joined_df, "simulation_df.csv",
+#            append =F, sep=",", na=".",row.names = F,col.names = T, quote = F)
 
 
