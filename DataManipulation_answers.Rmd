@@ -1,8 +1,10 @@
 ---
-title: "PSPG Bootcamp 2020: Data Manipulation and Plotting in R"
+title: 'PSPG Bootcamp 2020: Data Manipulation and Plotting in R'
 author: "Jackie Ernest and Vincent Chang"
 date: "8/12/2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 Objectives:
@@ -23,9 +25,9 @@ knitr::opts_chunk$set(echo = TRUE)
 Installing and Loading packages
 ```{r}
 #Comment out if you've already installed them
-install.packages("dplyr")
-install.packages("tidyr")
-install.packages("ggplot2")
+#install.packages("dplyr")
+#install.packages("tidyr")
+#install.packages("ggplot2")
 
 #Load libraries
 library(dplyr)
@@ -38,7 +40,7 @@ library(ggplot2)
 
 Loading your dataset
 ```{r}
-setwd("YOUR/PATH/HERE")
+setwd("~/Documents/Courses/Bootcamp/bootcamp_2020/")
 PKdata <- read.csv("simtab.csv")
 
 #Let's take a glimpse at your dataset
@@ -109,7 +111,7 @@ Arranging
 ```{r}
 #arrange() will reorder rows or columns according to your specifications (default from low to high)
 #For example in PK data we will often organize our rows by patient ID, then by time.
-PKdata <- arrange(ID, TIME)
+PKdata <- arrange(PKdata, ID, TIME)
 ```
 
 Putting it all together with Pipes %>%
@@ -166,6 +168,9 @@ ggplot(PKdata) +
 
 #Let's put them on the same graph with a +
 
+ggplot(PKdata) + 
+ geom_line(aes(x=TIME, y=DV,group=factor(ID)),alpha = 0.1, linetype=2,size=0.1) +
+  geom_point(aes(x=TIME, y=DV))
 
 ```
 
@@ -226,8 +231,8 @@ Dplyr can be used for simple summary statistics
 ```{r}
 #You can use summarise to calculate means, ranges, standard deviations, quartiles, etc.
 Summary_stats <- PKdata %>%
-  summarise(c_mean = mean(CONC),
-            c_stdev = stdev(CONC),
+  summarise(c_mean = mean(DV),
+            c_stdev = sd(DV),
             BW_mean = mean(BW),
             BW_upper = quantile(BW, probs = 0.975),
             BW_lower = quantile(BW, probs = 0.225))

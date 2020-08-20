@@ -200,8 +200,8 @@ Dplyr can be used for simple summary statistics
 ```{r}
 #You can use summarise to calculate means, ranges, standard deviations, quartiles, etc.
 Summary_stats <- PKdata %>%
-  summarise(c_mean = mean(CONC),
-            c_stdev = stdev(CONC),
+  summarise(c_mean = mean(DV),
+            c_stdev = sd(DV),
             BW_mean = _______,
             BW_upper = quantile(BW, probs = 0.975),
             BW_lower = _________)
