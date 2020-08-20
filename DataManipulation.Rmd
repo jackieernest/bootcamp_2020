@@ -55,7 +55,7 @@ Selecting
 ```{r}
 #You can select specific columns using select()
 #Let's de-identify our dataset by removing personally identifiable columns
-deidentified <- select(PKdata, ID, TIME, DV, DOSE, BW, SEX, HIV)
+deidentified <- select(PKdata, ID, TIME, DV, DOSE, HT, BW, SEX, HIV)
 head(deidentified)
 
 #You can also do this by "subtracting" the columns you don't want with -
