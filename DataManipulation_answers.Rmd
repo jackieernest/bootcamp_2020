@@ -1,0 +1,326 @@
+---
+title: "PSPG Bootcamp 2020: Data Manipulation and Plotting in R"
+author: "Jackie Ernest and Vincent Chang"
+date: "8/12/2020"
+output: html_document
+---
+
+Objectives:
+1) Learn the basics of dplyr
+    -Selecting, Filtering, and Arranging
+    -Making a series of function with pipes %>%
+    -Mutate new and existing columns
+    -Wide and long tables
+2) Learn the basics of ggplot2
+    -Setting up your dataframe for easy plotting
+    -Plot lines, scatter plots, boxplots
+    -Compare different subpopulations
+    
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Installing and Loading packages
+```{r}
+#Comment out if you've already installed them
+install.packages("dplyr")
+install.packages("tidyr")
+install.packages("ggplot2")
+
+#Load libraries
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+
+
+
+Loading your dataset
+```{r}
+setwd("YOUR/PATH/HERE")
+PKdata <- read.csv("simtab.csv")
+
+#Let's take a glimpse at your dataset
+head(PKdata)
+#Alternatively, click on PKdata in your Global Environment toolbar on the right
+
+#Let's open up the data dictionary too, it's always good practice to know your dataset
+
+```
+
+Dplyr Cheatsheet
+https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-transformation.pdf
+
+Selecting
+```{r}
+#You can select specific columns using select()
+#Let's de-identify our dataset by selecting the columns we want
+deidentified <- select(PKdata, ID, TIME, DV, DOSE, HT, BW, SEX, HIV)
+head(deidentified)
+
+#You can also do this by "subtracting" the columns you don't want with -
+deidentified <- select(PKdata, -PT_BIRTHDATE, -PT_ADDRESS, -PT_USUBJID)
+head(deidentified)
+
+#You can also search through your columns with helpers: contains(), starts_with(), ends_with()
+What_did_this_do <- select(PKdata, ends_with("V"))
+head(What_did_this_do)
+#Write your answer commented out below:
+#removed all columns that end with V
+
+#Can you use helpers to create the same deidentified dataset?
+deidentified <- select(PKdata, -starts_with("PT"))
+head(deidentified)
+
+
+```
+
+Filtering
+```{r}
+#You can filter out specific rows using filter()
+#For example, selecting all patients who received a specific dose
+Dosed_600 <- filter(PKdata, DOSE == 600)
+head(Dosed_600)
+
+#You can use any logical function in R to designate your filter criteria
+# > greater than, <= greater equal than
+# < less than, <= lesser equal than
+# ! not
+# & and
+# | or
+#Can you filter for patients with body weight greater or equal than 45kg?
+WT.GT.45 <- filter(PKdata, BW >= 45)
+head(WT.GT.45)
+
+#You can also use & or | to create more complex logical functions
+#Let's filter for patients that received a dose greater than or equal to 600 and HIV+
+Dosed600up_HIV <- filter(PKdata, DOSE >= 600 & HIV == 1)
+head(Dosed600up_HIV)
+
+#Challenge: Filter for patients who received the lowest or highest dose, and is female with HIV or male
+#Remember there are always many ways to code something :)
+Challenge <- filter(PKdata, DOSE != 600 & (HIV == 1 | SEX == 1))
+head(Challenge)
+
+```
+
+Arranging
+```{r}
+#arrange() will reorder rows or columns according to your specifications (default from low to high)
+#For example in PK data we will often organize our rows by patient ID, then by time.
+PKdata <- arrange(ID, TIME)
+```
+
+Putting it all together with Pipes %>%
+```{r}
+#Pipes are used to connect the output of one function to the input of another
+#Let's deidentify our dataset, filter for 600mg dose, and arrange by id and time all together
+Dose_600 <- PKdata %>%
+  select( -starts_with("PT")) %>%
+  filter(DOSE == 600) %>%
+  arrange(ID, TIME)
+
+#Try this one for yourself!
+#Let's try filtering for HIV+ or body weight less than 45kg, then...
+#we want to see the trough levels of each patient (defined as the 24hr timepoint)  
+
+Trough <-   PKdata %>%
+  select( -starts_with("PT")) %>%
+  filter(HIV == 1 | BW < 45) %>%
+  filter(TIME == 24)
+
+View(Trough)
+  
+  
+```
+
+Mutate
+```{r}
+#mutate() can create new columns or alter existing ones
+#For example, BMI is often calculated from HT and WT
+#BMI = weight(kg)/height(m)^2
+
+PKdata <- PKdata %>%
+  mutate(BMI = BW/(HT/39.37)^2) #are the units correct? check the data dictionary!
+
+#Now you try making a new column and converting DV from mg/L into micromoles!
+#The drug used here is remdesivir
+
+PKdata<- PKdata %>%
+  mutate(Conc_uM = DV/1000/602.6*1000000) #mg/L *1g/1000mg * 1mol/602.6g * 1000000uM/1M
+
+
+```
+
+Our first Plot!!
+ggplot2 cheatsheet: https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-visualization-2.1.pdf
+```{r}
+ggplot(PKdata) + 
+  geom_point(aes(x=TIME, y=DV)) ##What are we trying to plot with a PK profile?
+
+
+#Do you like lines better?
+ggplot(PKdata) + 
+ geom_line(aes(x=TIME, y=DV,group=factor(ID)),alpha = 0.1, linetype=2,size=0.1)
+
+#Let's put them on the same graph with a +
+
+
+```
+
+Graphing Subpopulations
+```{r}
+ggplot(PKdata) + 
+  geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) + 
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.1, linetype=2,size=0.1)
+```
+
+Another way to stratify
+```{r}
+#It's still a little too cluttered
+ggplot(PKdata) + 
+  geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) + 
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.1, linetype=2,size=0.1) +
+  facet_wrap(.~DOSE)
+```
+
+Let's try some on your own
+```{r}
+#Copy and paste from above, and let's plot stratified by HIV status
+ggplot(PKdata) + 
+  geom_point(aes(x=TIME, y=DV, color = as.factor(HIV))) +
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(HIV)),alpha = 0.1, linetype=2,size=0.1) +
+  facet_wrap(.~DOSE)
+
+
+
+#Now let's try adding 2 stratifications: color by HIV and facet_wrap by Dose~SEX. Then try the other way around!
+ggplot(PKdata) + 
+  geom_point(aes(x=TIME, y=DV, color = as.factor(HIV))) + 
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(HIV)),alpha = 0.1, linetype=2,size=0.1) +
+  facet_wrap(DOSE~SEX)
+
+ggplot(PKdata) + 
+  geom_point(aes(x=TIME, y=DV, color = as.factor(SEX))) +
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(SEX)),alpha = 0.1, linetype=2,size=0.1) +
+  facet_wrap(DOSE~~HIV)
+
+#Challenge: Plot stratified by body weight, one color for above 45kg and another color for below. Make sure to have a legend :)
+#Hint: you will need to manipulate your dataframe
+
+PKdata <- PKdata %>%
+  mutate(WT_FLAG = ifelse(BW > 45, 1, 0))
+
+ggplot(PKdata) + 
+  geom_point(aes(x=TIME, y=DV, color = as.factor(WT_FLAG))) + 
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(WT_FLAG)),alpha = 0.1, linetype=2,size=0.1) +
+  facet_wrap(.~DOSE)
+
+
+
+```
+
+Summarise
+Dplyr can be used for simple summary statistics
+```{r}
+#You can use summarise to calculate means, ranges, standard deviations, quartiles, etc.
+Summary_stats <- PKdata %>%
+  summarise(c_mean = mean(CONC),
+            c_stdev = stdev(CONC),
+            BW_mean = mean(BW),
+            BW_upper = quantile(BW, probs = 0.975),
+            BW_lower = quantile(BW, probs = 0.225))
+
+View(Summary_stats)
+
+```
+
+Combined with group_by(), summarise is a force to be reckoned with..
+```{r}
+#Let's calculate subpopulation summary statistics
+#For example, let's calculate body weight summary statistics by SEX
+BW_by_SEX <- PKdata %>%
+  group_by(SEX) %>%
+  summarise(BW_mean = mean(BW),
+            BW_upper = quantile(BW, probs = 0.975),
+            BW_lower = quantile(BW, probs = 0.225))
+
+#Let's plot it!
+ggplot(BW_by_SEX) +
+  geom_point(aes(x=SEX, y=BW_mean)) +
+  geom_errorbar((aes(x=SEX, ymin=BW_lower, ymax=BW_upper)))
+
+
+#An easier way to do it in just ggplot, there are always multiple ways to do the same thing
+ggplot(PKdata) +
+  geom_boxplot(aes(x=as.factor(SEX), y=BW))
+```
+
+Let's calculate the median PK profile
+```{r}
+#Let's start with calculating median and percentile profiles 
+Med <- PKdata %>%
+  group_by(TIME) %>%
+  summarise(median = median(DV),
+            upper = quantile(DV, probs=0.975), #Upper 95th percentile
+            lower = quantile(DV, probs=0.225)) #Lower 95th percentile
+
+#Let's plot it
+ggplot(Med) +
+  geom_line(aes(x=TIME, y=median)) +
+  geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper), alpha=0.3)
+```
+
+Let's compare median PK profiles of subpopulations
+```{r}
+#Let's do the same thing but subset by DOSE
+DOSE_Med <- PKdata %>%
+  group_by(DOSE,TIME) %>%
+  summarise(median = median(DV),
+            upper = quantile(DV, probs=0.975), #Upper 95th percentile
+            lower = quantile(DV, probs=0.225)) #Lower 95th percentile
+
+#Let's plot it
+ggplot(DOSE_Med) +
+  geom_line(aes(x=TIME, y=median, color = as.factor(DOSE))) +
+  geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper, fill = as.factor(DOSE)), alpha=0.3)
+```
+
+Let's try another one...
+```{r}
+#Median PK profiles, subset by HIV
+
+HIV_Med <- PKdata %>%
+  group_by(HIV,TIME) %>%
+  summarise(median = median(DV),
+            upper = quantile(DV, probs=0.975), #Upper 95th percentile
+            lower = quantile(DV, probs=0.225)) #Lower 95th percentile
+
+#Let's plot it
+ggplot(HIV_Med) +
+  geom_line(aes(x=TIME, y=median, color = as.factor(HIV))) +
+  geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper, fill = as.factor(HIV)), alpha=0.3)
+
+
+```
+
+This doesn't really work...the different dosing levels make the stratification cluttered
+```{r}
+#We need to subset by DOSE and HIV
+#Prepare the dataset yourself
+
+HIV_Med <- PKdata %>%
+  group_by(DOSE, HIV,TIME) %>%
+  summarise(median = median(DV),
+            upper = quantile(DV, probs=0.975), #Upper 95th percentile
+            lower = quantile(DV, probs=0.225)) #Lower 95th percentile
+
+#Let's plot it
+ggplot(HIV_Med) +
+  geom_line(aes(x=TIME, y=median, color = as.factor(HIV))) +
+  geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper, fill = as.factor(HIV)), alpha=0.3) +
+  facet_wrap(.~DOSE)
+
+```
+
