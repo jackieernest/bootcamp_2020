@@ -39,11 +39,13 @@ library(ggplot2)
 Loading your dataset
 ```{r}
 setwd("YOUR/PATH/HERE")
-PKdata <- read.csv("simulation_df.csv")
-simtab <- read_nm_table("~/Documents/Courses/Bootcamp/bootcamp_2020/nm/sdtab01")
+PKdata <- read.csv("simtab.csv")
+
 #Let's take a glimpse at your dataset
 head(PKdata)
 #Alternatively, click on PKdata in your Global Environment toolbar on the right
+
+#Let's open up the data dictionary too, it's always good practice to know your dataset
 ```
 
 Dplyr Cheatsheet
@@ -54,12 +56,15 @@ Selecting
 #You can select specific columns using select()
 #Let's de-identify our dataset by removing personally identifiable columns
 deidentified <- select(PKdata, ID, TIME, DV, DOSE, BW, SEX, HIV)
+head(deidentified)
 
 #You can also do this by "subtracting" the columns you don't want with -
 deidentified <- select(PKdata, _________________________)
+head(deidentified)
 
 #You can also search through your columns with helpers: contains(), starts_with(), ends_with()
 What_did_this_do <- select(PKdata, ends_with("V"))
+head(What_did_this_do)
 #Write your answer commented out below:
 
 
@@ -106,18 +111,20 @@ Putting it all together with Pipes %>%
 ```{r}
 #Pipes are used to connect the output of one function to the input of another
 #Let's deidentify our dataset, filter for 600mg dose, and arrange by id and time all together
-PKdata1 <- PKdata %>%
+DOSE_600 <- PKdata %>%
   select(_________) %>%
   filter(_________) %>%
   arrange(_________)
 
 #Try this one for yourself!
-#Let's rename DV into CONC, remove the DV column, filter for HIV+ or body weight less than 45kg, then...
-#we want to see the trough levels of each patient (defined as the 24hr timepoint)
+#Let's try filtering for HIV+ or body weight less than 45kg, then...
+#we want to see the trough levels of each patient (defined as the 24hr timepoint)  
 
+Trough <-   
+  
+  
 
-
-
+  
 ```
 
 Mutate
@@ -126,7 +133,7 @@ Mutate
 #For example, BMI is often calculated from HT and WT
 #BMI = weight(kg)/height(m)^2
 
-PKdata1 <- PKdata1 %>%
+PKdata <- PKdata %>%
   mutate(BMI = BW/HT^2) #are the units correct? check the data dictionary!
 
 #Now you try converting DV from mg/L into micromoles!
@@ -141,22 +148,30 @@ Our first Plot!!
 ggplot2 cheatsheet: https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-visualization-2.1.pdf
 ```{r}
 ggplot(DATA_GOES_HERE) + 
-  geom_point(aes(x=____, y=_____)) + ##What are we trying to plot with a PK profile?
-  geom_line(aes(x=____,y=_____,group=factor(ID)),alpha = 0.1, linetype=2,size=0.1)
+  geom_point(aes(x=____, y=_____)) ##What are we trying to plot with a PK profile?
+
+
+#Do you like lines better?
+ggplot(DATA_GOES_HERE) + 
+ geom_line(aes(x=____,y=_____,group=factor(ID)),alpha = 0.1, linetype=2,size=0.1)
+
+#Let's put them on the same graph with a +
+
+
 ```
 
 Graphing Subpopulations
 ```{r}
-ggplot(simtab) + 
-  geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) + ##What are we trying to plot with a PK profile?
+ggplot(PKdata) + 
+  geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) +
   geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.1, linetype=2,size=0.1)
 ```
 
 Another way to stratify
 ```{r}
 #It's still a little too cluttered
-ggplot(simtab) + 
-  geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) + ##What are we trying to plot with a PK profile?
+ggplot(PKdata) + 
+  geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) + 
   geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.1, linetype=2,size=0.1) +
   facet_wrap(.~DOSE)
 ```
@@ -168,7 +183,7 @@ Let's try some on your own
 
 
 
-#Now let's try adding 2 stratifications: color by HIV and facet_wrap by SEX. Then try the other way around!
+#Now let's try adding 2 stratifications: color by HIV and facet_wrap by Dose~SEX. Then try the other way around!
 
 
 
@@ -178,5 +193,94 @@ Let's try some on your own
 
 
 
+```
+
+Summarise
+Dplyr can be used for simple summary statistics
+```{r}
+#You can use summarise to calculate means, ranges, standard deviations, quartiles, etc.
+Summary_stats <- PKdata %>%
+  summarise(c_mean = mean(CONC),
+            c_stdev = stdev(CONC),
+            BW_mean = _______,
+            BW_upper = quantile(BW, probs = 0.975),
+            BW_lower = _________)
+
+View(Summary_stats)
+
+```
+
+Combined with group_by(), summarise is a force to be reckoned with..
+```{r}
+#Let's calculate subpopulation summary statistics
+#For example, let's calculate body weight summary statistics by SEX
+BW_by_SEX <- PKdata %>%
+  group_by(SEX) %>%
+  summarise(BW_mean = _______, #Copy and paste from above
+            BW_upper = ________,
+            BW_lower = _________)
+
+#Let's plot it!
+ggplot(BW_by_SEX) +
+  geom_point(aes(x=SEX, y=BW_mean)) +
+  geom_errorbar((aes(x=SEX, ymin=BW_lower, ymax=_____)))
+
+
+#An easier way to do it in just ggplot, there are always multiple ways to do the same thing
+ggplot(PKdata) +
+  geom_boxplot(aes(x=as.factor(SEX), y=BW))
+```
+
+Let's calculate the median PK profile
+```{r}
+#Let's start with calculating median and percentile profiles 
+Med <- PKdata %>%
+  group_by(TIME) %>%
+  summarise(median = median(DV),
+            upper = quantile(_________), #Upper 95th percentile
+            lower = quantile(_________)) #Lower 95th percentile
+
+#Let's plot it
+ggplot(Med) +
+  geom_line(aes(x=TIME, y=median)) +
+  geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper), alpha=0.3)
+```
+
+Let's compare median PK profiles of subpopulations
+```{r}
+#Let's do the same thing but subset by DOSE
+DOSE_Med <- PKdata %>%
+  group_by(____,TIME) %>%
+  summarise(median = median(DV),
+            upper = _________, #Upper 95th percentile
+            lower = _________) #Lower 95th percentile
+
+#Let's plot it
+ggplot(DOSE_Med) +
+  geom_line(aes(x=TIME, y=median, color = _______)) +
+  geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper, fill = _____), alpha=0.3)
+```
+
+Let's try another one...
+```{r}
+#Median PK profiles, subset by HIV
+
+
+
+
+```
+
+This doesn't really work...the different dosing levels make the stratification cluttered
+```{r}
+#We need to subset by DOSE and HIV
+#Prepare the dataset yourself
+
+
+
+#Let's plot it
+ggplot(YOUR_DATA_HERE) +
+  geom_line(aes(x=TIME, y=median, color=as.factor(HIV))) +
+  geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper, fill=factor(HIV)), alpha=0.3) +
+  facet_wrap(.~______)
 ```
 
