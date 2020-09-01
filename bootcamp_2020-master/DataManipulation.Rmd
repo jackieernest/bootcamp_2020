@@ -1,26 +1,32 @@
 ---
-title: "PSPG Bootcamp 2020: Data Manipulation and Plotting in R"
-author: "Jackie Ernest and Vincent Chang"
-date: "8/12/2020"
-output: html_document
+title: 'PSPG Bootcamp 2020: Data Manipulation and Plotting in R'
+author: "Vincent Chang and Jackie Ernest"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 1
+  pdf_document: default
+
 ---
 
-Objectives:
-1) Learn the basics of dplyr
-    -Selecting, Filtering, and Arranging
-    -Making a series of function with pipes %>%
-    -Mutate new and existing columns
-    -Wide and long tables
-2) Learn the basics of ggplot2
-    -Setting up your dataframe for easy plotting
-    -Plot lines, scatter plots, boxplots
-    -Compare different subpopulations
+<b>Objectives: </b><br>
+<b>1) Learn the basics of dplyr </b> <br>
+    -Selecting, Filtering, and Arranging <br>
+    -Making a series of function with pipes %>% <br>
+    -Mutate new and existing columns <br>
+    -Wide and long tables <br>
+<br>
+<b> 2) Learn the basics of ggplot2 </b> <br>
+    -Setting up your dataframe for easy plotting <br>
+    -Plot lines, scatter plots, boxplots <br>
+    -Compare different subpopulations <br>
     
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Installing and Loading packages
+# Installing and Loading packages
 ```{r}
 #Comment out if you've already installed them
 install.packages("dplyr")
@@ -36,7 +42,7 @@ library(ggplot2)
 
 
 
-Loading your dataset
+# Loading your dataset
 ```{r}
 setwd("YOUR/PATH/HERE")
 PKdata <- read.csv("simtab.csv")
@@ -48,10 +54,34 @@ head(PKdata)
 #Let's open up the data dictionary too, it's always good practice to know your dataset
 ```
 
+
+## Understanding your dataset
+```{r}
+
+#Below are a few other ways to get a high-level glance at your data
+glimpse(PKdata)
+summary(PKdata)
+
+#Don't know what a function does? Add a question mark to view its documentation
+?table
+
+#You can use table to compare counts of different variables
+table(PKdata$SEX, PKdata$HIV)
+
+#To add titles
+table("SEX" = PKdata$SEX, "HIV" = PKdata$HIV)
+
+#How many females were in each dose level?
+table(______, _____)
+
+```
+
+
 Dplyr Cheatsheet
 https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-transformation.pdf
 
-Selecting
+# Learn the basics of dplyr
+## Selecting
 ```{r}
 #You can select specific columns using select()
 #Let's de-identify our dataset by removing personally identifiable columns
@@ -74,7 +104,7 @@ head(What_did_this_do)
 
 ```
 
-Filtering
+## Filtering
 ```{r}
 #You can filter out specific rows using filter()
 #For example, selecting all patients who received a specific dose
@@ -100,14 +130,14 @@ Dosed600up_HIV <- filter(PKdata, _________ & _________)
 
 ```
 
-Arranging
+## Arranging
 ```{r}
 #arrange() will reorder rows or columns according to your specifications (default from low to high)
 #For example in PK data we will often organize our rows by patient ID, then by time.
 PKdata <- arrange(__________)
 ```
 
-Putting it all together with Pipes %>%
+## Putting it all together with Pipes %>%
 ```{r}
 #Pipes are used to connect the output of one function to the input of another
 #Let's deidentify our dataset, filter for 600mg dose, and arrange by id and time all together
@@ -127,7 +157,7 @@ Trough <-
   
 ```
 
-Mutate
+## Mutate
 ```{r}
 #mutate() can create new columns or alter existing ones
 #For example, BMI is often calculated from HT and WT
@@ -144,7 +174,9 @@ PKdata <- PKdata %>%
 
 ```
 
-Our first Plot!!
+# Learn the basics of ggplot2
+
+## Our first Plot!!
 ggplot2 cheatsheet: https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-visualization-2.1.pdf
 ```{r}
 ggplot(DATA_GOES_HERE) + 
@@ -160,14 +192,14 @@ ggplot(DATA_GOES_HERE) +
 
 ```
 
-Graphing Subpopulations
+## Graphing Subpopulations
 ```{r}
 ggplot(PKdata) + 
   geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) +
   geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.1, linetype=2,size=0.1)
 ```
 
-Another way to stratify
+## Another way to stratify
 ```{r}
 #It's still a little too cluttered
 ggplot(PKdata) + 
@@ -176,7 +208,7 @@ ggplot(PKdata) +
   facet_wrap(.~DOSE)
 ```
 
-Let's try some on your own
+## Let's try some on your own
 ```{r}
 #Copy and paste from above, and let's plot stratified by HIV status
 
@@ -195,7 +227,7 @@ Let's try some on your own
 
 ```
 
-Summarise
+## Summarise
 Dplyr can be used for simple summary statistics
 ```{r}
 #You can use summarise to calculate means, ranges, standard deviations, quartiles, etc.
@@ -210,7 +242,7 @@ View(Summary_stats)
 
 ```
 
-Combined with group_by(), summarise is a force to be reckoned with..
+## Combined with group_by(), summarise is a force to be reckoned with..
 ```{r}
 #Let's calculate subpopulation summary statistics
 #For example, let's calculate body weight summary statistics by SEX
@@ -231,7 +263,7 @@ ggplot(PKdata) +
   geom_boxplot(aes(x=as.factor(SEX), y=BW))
 ```
 
-Let's calculate the median PK profile
+## Let's calculate the median PK profile
 ```{r}
 #Let's start with calculating median and percentile profiles 
 Med <- PKdata %>%
@@ -246,7 +278,7 @@ ggplot(Med) +
   geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper), alpha=0.3)
 ```
 
-Let's compare median PK profiles of subpopulations
+## Let's compare median PK profiles of subpopulations
 ```{r}
 #Let's do the same thing but subset by DOSE
 DOSE_Med <- PKdata %>%
@@ -261,7 +293,7 @@ ggplot(DOSE_Med) +
   geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper, fill = _____), alpha=0.3)
 ```
 
-Let's try another one...
+## Let's try another one...
 ```{r}
 #Median PK profiles, subset by HIV
 
@@ -270,7 +302,7 @@ Let's try another one...
 
 ```
 
-This doesn't really work...the different dosing levels make the stratification cluttered
+## This doesn't really work...the different dosing levels make the stratification cluttered
 ```{r}
 #We need to subset by DOSE and HIV
 #Prepare the dataset yourself

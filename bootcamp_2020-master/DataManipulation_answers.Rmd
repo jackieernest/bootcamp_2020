@@ -1,19 +1,23 @@
 ---
 title: 'PSPG Bootcamp 2020: Data Manipulation and Plotting in R'
 author: "Vincent Chang and Jackie Ernest"
-date: "8/12/2020"
+date: "`r Sys.Date()`"
 output:
-  html_document: default
+  html_document:
+    toc: true
+    toc_depth: 1
   pdf_document: default
+
 ---
 
-Objectives: <br>
-1) Learn the basics of dplyr <br>
+<b>Objectives: </b><br>
+<b>1) Learn the basics of dplyr </b> <br>
     -Selecting, Filtering, and Arranging <br>
     -Making a series of function with pipes %>% <br>
     -Mutate new and existing columns <br>
     -Wide and long tables <br>
-2) Learn the basics of ggplot2 <br>
+<br>
+<b> 2) Learn the basics of ggplot2 </b> <br>
     -Setting up your dataframe for easy plotting <br>
     -Plot lines, scatter plots, boxplots <br>
     -Compare different subpopulations <br>
@@ -48,6 +52,25 @@ head(PKdata)
 #Alternatively, click on PKdata in your Global Environment toolbar on the right
 
 #Let's open up the data dictionary too, it's always good practice to know your dataset
+```
+
+## Understanding your dataset
+```{r}
+#Below are a few other ways to get a high-level glance at your data
+glimpse(PKdata)
+summary(PKdata)
+
+#Don't know what a function does? Add a question mark to view its documentation
+?table
+
+#You can use table to compare counts of different variables
+table(PKdata$SEX, PKdata$HIV)
+
+#To add titles
+table("SEX" = PKdata$SEX, "HIV" = PKdata$HIV)
+
+#How many females were in each dose level?
+table("DOSE" = PKdata$DOSE,"SEX" = PKdata$SEX)
 
 ```
 
