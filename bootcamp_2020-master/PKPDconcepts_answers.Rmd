@@ -1,0 +1,244 @@
+---
+title: "PKPD concepts"
+author: "Vincent Chang and Jackie Ernest"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: TRUE
+  pdf_document: default
+---
+<br>
+<br>
+<b> Objectives </b><br>
+
+<b> 1) Questions and review from yesterday </b> <br>
+<br>
+<b> 2) Familiarize with PK parameters in Rshiny app </b> <br>
+    -Effects of regimen and route of administration <br>
+    -Effects of PK parameters: CL, V, Ka, and F <br>
+    -Effects of population variability <br>
+<br>
+<b> 3) Concepts in modeling and simulation in Rshiny app </b> <br>
+    -"Fit" our data from yesterday using Rshiny app <br>
+    -Simulate different scenarios by changing dose and frequency <br>
+    
+<b> 4) Use PKPDsim to create your own model and simulations </b> <br>
+    -EXCERISE 1: rebuild your model
+    -EXERCISE 2: simulate alternate scenarios
+<br>
+<br>
+<b> PKPDsim documentation: </b> <br>
+<http://pkpdsim.ronkeizer.com/getting-started.html> <br>
+
+# Installing and Loading packages
+```{r warning=F, message=F}
+#Comment out if you've already installed them
+#install.packages("dplyr")
+#install.packages("tidyr")
+#install.packages("ggplot2")
+
+# library(devtools)
+# install_github("ronkeizer/PKPDsim")
+
+#Load libraries
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(PKPDsim)
+
+```
+
+# EXERCISE 1: Rebuild your Rshiny model using PKPDsim
+
+## Model components
+
+Running a simulation requires THREE arguments: <br>
+  1. Model <br>
+  2. Parameters <br>
+  3. Regimen <br>
+
+## 1. Model
+
+
+```{r}
+
+# The PKPDsim library has pre-packaged models. 
+# They can be viewed by running new_ode_model() with an empty bracket. 
+# You can deploy them by saving to a variable:
+
+# i.e. my_model <- new_ode_model("pk_1cmt_oral")
+
+# Here we will hard code the model for a 2cmt oral model. 
+# In your courses, you will learn to write out your own ordinary differential equations (ODE).
+
+my_model <- new_ode_model(code = "
+      dAdt[1] = -KA*A[1]
+      dAdt[2] = KA*A[1] - CL/V*A[2] - Q/V*A[2] + Q/V2*A[3]
+      dAdt[3] = Q/V*A[2] - Q/V2*A[3]
+      CP = A[2]/V
+      ",
+      obs = list(cmt = 2, scale = "V"),
+      declare_variables = c("CP"))
+
+# run "my_model" to see the model summary and required parameters
+
+my_model
+
+```
+
+## 2. Parameters
+
+```{r}
+# Input your PK parameters you derived from the Rshiny app here:
+
+V = 500 # Central volume (L)
+CL = 25 # Clearance (L/h)
+KA = 1 # Rate of absorption (1/h)
+Q = 10 # Intercompartmental clearance (L/h)
+V2 = 1000 # Peripheral volume (L)
+
+# We'll store these in a list that PKPDsim can read
+my_parameters <- list("V"  = V,
+                      "CL" = CL,
+                      "KA" = KA,
+                      "Q"  = Q,
+                      "V2" = V2
+                      )
+  
+```
+
+## 3. Regimen
+
+```{r}
+# One single dose of 300 mg at time 0
+# Look up ?new_regimen to see arguments this function takes
+
+my_regimen <- new_regimen(amt=300, time=0) 
+
+```
+
+## Simulate!
+
+Put it all together <br>
+Use sim() to create a dataset of simulation
+
+
+```{r}
+# fill in the three arguments with our three components from above
+my_simulated_df <- sim(ode = my_model,
+                       regimen = my_regimen,
+                       parameters = my_parameters,
+                       only_obs = T,
+                       output_include = list(variables=T)
+                       )
+# Open your new dataset and understand the set up. 
+# What is each column? What are the units of each column?
+```
+
+## Plot
+
+```{r}
+# use ggplot to plot the data (feel free to copy and paste from yesterday's workshop)
+
+ggplot(my_simulated_df, mapping=aes(x=t,y=y))+
+  geom_line()
+
+# does your plot look similar to your model in the Rshiny app?
+
+```
+```{r}
+
+# challenge: can you add the 300 mg dose data from simtab.csv to this plot?
+
+data <- read.csv("simtab.csv") %>%
+  filter(DOSE==300)
+
+ggplot(my_simulated_df, mapping=aes(x=t,y=y))+
+  geom_line()+
+  geom_point(data, mapping=aes(x=TIME,y=DV))
+
+
+```
+
+
+
+# EXERCISE 2: Simulate alternate scenarios
+
+Now that we have a model, we can use it to simulate alternate scenarios. <br>
+
+Make a new regimen with new_regimen() and change the amt and time to change the dose and frequency. <br>
+
+## Efficacy and Toxicity Thresholds
+Can you find a regimen that keeps you in a therapeutic window that stays below the level of toxicity and above the level of efficacy? <br>
+```{r}
+
+tox_threshold <- 2.7 #mg/L
+eff_threshold <- 1.1 #mg/L
+
+```
+
+## New Regimens
+
+```{r}
+# Create a new regimen
+# Look up ?new_regimen to see what arguments this function takes
+
+# HINT: for multiple dosing, you will need a vector of times.
+# A vector can be created using c(). 
+## ex. c(0,24,48,72)
+
+# Another way is to use seq(). 
+## ex. seq(start_time, end_time, increment)
+
+my_regimen <- new_regimen(amt=600, time=seq(0,28*24,12)) 
+
+```
+
+## Simulate new regimen
+
+```{r}
+# fill in the three arguments with our three components from above
+my_simulated_df <- sim(ode = my_model,
+                       regimen = my_regimen,
+                       parameters = my_parameters,
+                       only_obs = T,
+                       output_include = list(variables=T),
+                       t_obs = seq(0,31*24,0.1)
+                       )
+```
+
+## Plot your simulation
+
+```{r}
+# use ggplot to plot the data 
+# use geom_hline to add lines for your efficacy and toxicity thresholds
+
+ggplot(my_simulated_df, mapping=aes(x=t,y=y))+
+  geom_line()+
+  geom_hline(yintercept = tox_threshold)+
+  geom_hline(yintercept = eff_threshold)+
+  ylab("Concentration (mg/L)")+
+  xlab("Time (hr)")+
+  theme_bw()
+
+# does your plot look similar to your model in the Rshiny app?
+```
+
+# Additional exploration
+
+```{r}
+# How does the plot change with increased frequency?
+# How does the plot change with increased dose?
+```
+
+
+## Shortcuts
+### Run an Rmd chunk all at once: CMD +SHIFT + RETURN
+### Create a new Rmd chunk:    OPTION + CMD + I
+### Create a pipe (%>%) :        CMD + SHIFT + M
+### Create an arrow (<-) :       OPTION + dash (-)
+### To un/comment several lines at once: highlight lines + CMD + SHIFT + C
+
+
