@@ -352,7 +352,8 @@ HIV_Med <- PKdata %>%
 ggplot(HIV_Med) +
   geom_line(aes(x=TIME, y=median, color = as.factor(HIV))) +
   geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper, fill = as.factor(HIV)), alpha=0.3) +
-  facet_wrap(.~DOSE)
+  facet_wrap(.~DOSE) +
+  scale_y_log10()
 
 ```
 

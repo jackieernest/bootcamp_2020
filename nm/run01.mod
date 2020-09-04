@@ -32,7 +32,7 @@ KE = CL/V
 $DES      
 DADT(1)=-KA*A(1)
 DADT(2)= KA*A(1)-KE*A(2) -Q/V2*A(2) + Q/V2*A(3)
-DADT(3)= KA*A(1)-KE*A(2) +Q/V2*A(2) - Q/V2*A(3)
+DADT(3)= Q/V2*A(2) - Q/V2*A(3)
 
 $ERROR         
 
@@ -48,13 +48,13 @@ Y = IPRED + W*EPS(1)
 $THETA
 0 FIX  ; 1 Additive Error
 (0, 0.1) FIX ; 2 Proportional Error
-(0, 35) FIX   ; 3 CL L/h
-(0, 500) FIX   ; 4 V L
+(0, 20) FIX   ; 3 CL L/h
+(0, 50) FIX   ; 4 V L
 (0, 1) FIX   ; 5 KA 1/h
-(0, 0.01) FIX   ; 6 Q
-(0, 100) FIX    ; 7 V2
-0.25 FIX ; 8 effect of HIV
-0.05 FIX ; 9 effect of BW
+(0, 300) FIX   ; 6 Q
+(0, 10000) FIX    ; 7 V2
+0.5 FIX ; 8 effect of HIV
+0 FIX ; 9 effect of BW
 
 $OMEGA 
 0 FIX    ; 1 Additive Error

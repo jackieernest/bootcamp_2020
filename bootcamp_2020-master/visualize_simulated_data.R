@@ -2,9 +2,9 @@
 library(xpose)
 
 # visualize simulated data
-setwd("./nm/")
-df <- read_nm_tables("sdtab01") %>%
-  filter(EVID==0)
+setwd("~/Dropbox/PSPG_paperwork/Bootcamp_2020/bootcamp_2020/nm")
+df <- read_nm_tables("sdtab01") #%>%
+  #filter(EVID==0)
 
 
 ggplot(df, mapping=aes(x=TIME, y=IPRED, group=ID, color=factor(HIV)))+
@@ -17,5 +17,13 @@ ggplot(df, mapping=aes(x=TIME, y=IPRED, group=ID, color=factor(HIV)))+
   scale_color_brewer(palette="Paired")+
   theme_bw()
 
+# compare with simtab (made by Vincent with extra patient info columns)
 
+simtab <- read.csv("../bootcamp_2020-master/simtab.csv")
 
+# add the new DVs to simtab.csv
+
+simtab$DV <- df$DV
+
+#write.csv(simtab, "../simtab.csv", row.names=F)
+#write.csv(simtab, "../bootcamp_2020-master/simtab.csv", row.names=F)

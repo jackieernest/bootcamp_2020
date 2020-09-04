@@ -1,4 +1,4 @@
-Wed Aug 12 15:32:28 PDT 2020
+Fri Sep  4 14:28:52 PDT 2020
 ;; 2. Description: adjusted amount used
 ;; x1. Author: jackie
 $PROBLEM    rabbit PK
@@ -33,7 +33,7 @@ KE = CL/V
 $DES      
 DADT(1)=-KA*A(1)
 DADT(2)= KA*A(1)-KE*A(2) -Q/V2*A(2) + Q/V2*A(3)
-DADT(3)= KA*A(1)-KE*A(2) +Q/V2*A(2) - Q/V2*A(3)
+DADT(3)= Q/V2*A(2) - Q/V2*A(3)
 
 $ERROR         
 
@@ -48,13 +48,13 @@ Y = IPRED + W*EPS(1)
 
 $THETA  0 FIX ; 1 Additive Error
  (0,0.1) FIX ; 2 Proportional Error
- (0,35) FIX ; 3 CL L/h
- (0,500) FIX ; 4 V L
+ (0,20) FIX ; 3 CL L/h
+ (0,50) FIX ; 4 V L
  (0,1) FIX ; 5 KA 1/h
- (0,0.01) FIX ; 6 Q
- (0,100) FIX ; 7 V2
- 0.25 FIX ; 8 effect of HIV
- 0.05 FIX ; 9 effect of BW
+ (0,300) FIX ; 6 Q
+ (0,10000) FIX ; 7 V2
+ 0.5 FIX ; 8 effect of HIV
+ 0 FIX ; 9 effect of BW
 $OMEGA  0  FIX  ; 1 Additive Error_
  0.08  FIX  ;   2 IIV CL
 $SIGMA  1  FIX
@@ -75,8 +75,8 @@ NM-TRAN MESSAGES
 
 License Registered to: UCSF
 Expiration Date:    14 APR 2021
-Current Date:       12 AUG 2020
-Days until program expires : 247
+Current Date:        4 SEP 2020
+Days until program expires : 225
 1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.4.2
  ORIGINALLY DEVELOPED BY STUART BEAL, LEWIS SHEINER, AND ALISON BOECKMANN
  CURRENT DEVELOPERS ARE ROBERT BAUER, ICON DEVELOPMENT SOLUTIONS,
@@ -114,13 +114,13 @@ Days until program expires : 247
  LOWER BOUND    INITIAL EST    UPPER BOUND
   0.0000E+00     0.0000E+00     0.0000E+00
   0.1000E+00     0.1000E+00     0.1000E+00
-  0.3500E+02     0.3500E+02     0.3500E+02
-  0.5000E+03     0.5000E+03     0.5000E+03
+  0.2000E+02     0.2000E+02     0.2000E+02
+  0.5000E+02     0.5000E+02     0.5000E+02
   0.1000E+01     0.1000E+01     0.1000E+01
-  0.1000E-01     0.1000E-01     0.1000E-01
-  0.1000E+03     0.1000E+03     0.1000E+03
-  0.2500E+00     0.2500E+00     0.2500E+00
-  0.5000E-01     0.5000E-01     0.5000E-01
+  0.3000E+03     0.3000E+03     0.3000E+03
+  0.1000E+05     0.1000E+05     0.1000E+05
+  0.5000E+00     0.5000E+00     0.5000E+00
+  0.0000E+00     0.0000E+00     0.0000E+00
 0INITIAL ESTIMATE OF OMEGA:
  0.0000E+00
  0.0000E+00   0.8000E-01
@@ -221,9 +221,9 @@ SEED   2 RESET TO INITIAL: YES
     SEED1:    2124312287   SEED2:             0
  SOURCE  2:
     SEED1:         54321   SEED2:             0
- Elapsed simulation  time in seconds:     0.04
+ Elapsed simulation  time in seconds:     0.02
  ESTIMATION STEP OMITTED:                 YES
- Elapsed finaloutput time in seconds:     0.33
- #CPUT: Total CPU Time in Seconds,        0.497
+ Elapsed finaloutput time in seconds:     0.38
+ #CPUT: Total CPU Time in Seconds,        0.521
 Stop Time:
-Wed Aug 12 15:32:35 PDT 2020
+Fri Sep  4 14:28:58 PDT 2020
