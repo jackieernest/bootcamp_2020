@@ -93,11 +93,11 @@ my_model
 ```{r}
 # Input your PK parameters you derived from the Rshiny app here:
 
-V = 500 # Central volume (L)
-CL = 25 # Clearance (L/h)
+V = 50 # Central volume (L)
+CL = 20 # Clearance (L/h)
 KA = 1 # Rate of absorption (1/h)
-Q = 10 # Intercompartmental clearance (L/h)
-V2 = 1000 # Peripheral volume (L)
+Q = 300 # Intercompartmental clearance (L/h)
+V2 = 10000 # Peripheral volume (L)
 
 # We'll store these in a list that PKPDsim can read
 my_parameters <- list("V"  = V,
