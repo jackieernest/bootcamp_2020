@@ -39,9 +39,6 @@ output:
 #install.packages("tidyr")
 #install.packages("ggplot2")
 
-# library(devtools)
-# install_github("ronkeizer/PKPDsim")
-
 #Load libraries
 library(dplyr)
 library(tidyr)
@@ -70,13 +67,12 @@ Running a simulation requires THREE arguments: <br>
 
 # i.e. my_model <- new_ode_model("pk_1cmt_oral")
 
-# Here we will hard code the model for a 2cmt oral model. 
+# Here we will hard code the model for a 1cmt oral model. 
 # In your courses, you will learn to write out your own ordinary differential equations (ODE).
 
 my_model <- new_ode_model(code = "
       dAdt[1] = -KA*A[1]
-      dAdt[2] = KA*A[1] - CL/V*A[2] - Q/V*A[2] + Q/V2*A[3]
-      dAdt[3] = Q/V*A[2] - Q/V2*A[3]
+      dAdt[2] = KA*A[1] - CL/V*A[2]
       CP = A[2]/V
       ",
       obs = list(cmt = 2, scale = "V"),
@@ -93,18 +89,15 @@ my_model
 ```{r}
 # Input your PK parameters you derived from the Rshiny app here:
 
-V = 50 # Central volume (L)
-CL = 20 # Clearance (L/h)
+V = 220 # Central volume (L)
+CL = 86 # Clearance (L/h)
 KA = 1 # Rate of absorption (1/h)
-Q = 300 # Intercompartmental clearance (L/h)
-V2 = 10000 # Peripheral volume (L)
+
 
 # We'll store these in a list that PKPDsim can read
 my_parameters <- list("V"  = V,
                       "CL" = CL,
-                      "KA" = KA,
-                      "Q"  = Q,
-                      "V2" = V2
+                      "KA" = KA
                       )
   
 ```
@@ -148,6 +141,8 @@ ggplot(my_simulated_df, mapping=aes(x=t,y=y))+
 # does your plot look similar to your model in the Rshiny app?
 
 ```
+
+
 ```{r}
 
 # challenge: can you add the 300 mg dose data from simtab.csv to this plot?
@@ -155,9 +150,9 @@ ggplot(my_simulated_df, mapping=aes(x=t,y=y))+
 data <- read.csv("simtab.csv") %>%
   filter(DOSE==300)
 
-ggplot(my_simulated_df, mapping=aes(x=t,y=y))+
-  geom_line()+
-  geom_point(data, mapping=aes(x=TIME,y=DV))
+ggplot()+
+  geom_line(data=my_simulated_df, aes(x=t,y=y))+
+  geom_point(data=data, aes(x=TIME,y=DV))
 
 
 ```
@@ -170,33 +165,35 @@ Now that we have a model, we can use it to simulate alternate scenarios. <br>
 
 Make a new regimen with new_regimen() and change the amt and time to change the dose and frequency. <br>
 
-## Efficacy and Toxicity Thresholds
+### Efficacy and Toxicity Thresholds
 Can you find a regimen that keeps you in a therapeutic window that stays below the level of toxicity and above the level of efficacy? <br>
 ```{r}
 
-tox_threshold <- 2.7 #mg/L
+tox_threshold <- 2.8 #mg/L
 eff_threshold <- 1.1 #mg/L
 
 ```
 
-## New Regimens
+### New Regimens
 
 ```{r}
 # Create a new regimen
 # Look up ?new_regimen to see what arguments this function takes
 
+#Instead of a single dose, now let's look at multiple doses across 4 weeks (28 days)
 # HINT: for multiple dosing, you will need a vector of times.
 # A vector can be created using c(). 
 ## ex. c(0,24,48,72)
 
 # Another way is to use seq(). 
 ## ex. seq(start_time, end_time, increment)
+## ex. daily dosing for 28 days: seq(0,28*24,24)
 
-my_regimen <- new_regimen(amt=600, time=seq(0,28*24,12)) 
+my_regimen <- new_regimen(amt=900, time=seq(0,28*24,6)) 
 
 ```
 
-## Simulate new regimen
+### Simulate new regimen
 
 ```{r}
 # fill in the three arguments with our three components from above
@@ -209,7 +206,7 @@ my_simulated_df <- sim(ode = my_model,
                        )
 ```
 
-## Plot your simulation
+### Plot your simulation
 
 ```{r}
 # use ggplot to plot the data 
@@ -223,16 +220,87 @@ ggplot(my_simulated_df, mapping=aes(x=t,y=y))+
   xlab("Time (hr)")+
   theme_bw()
 
-# does your plot look similar to your model in the Rshiny app?
+# Are you within the therapeutic window?
+# If not, simulate different regimens!
 ```
 
-# Additional exploration
+### Additional exploration
 
 ```{r}
 # How does the plot change with increased frequency?
+# higher drug accumulation before next dose, higher steady state concentrations
+
 # How does the plot change with increased dose?
+# much higher max drug concentration, slightly higher min drug concentration, higher overall steady state
+
+# What's your recommendation? What dose do we need to stay in the therapeutic window?
+# 900mg dose, 4 times daily
 ```
 
+
+## Challenge Exercise
+You are told that HIV+ patients are not receiving therapeutic doses <br>
+Let's confirm that for ourselves..
+```{r}
+# Input your PK parameters for the HIV subpopulation that you derived from the Rshiny app here:
+
+V_HIV = 220
+CL_HIV = 160
+KA_HIV = 1
+
+# We'll store these in a list that PKPDsim can read
+HIV_parameters <- list("V"  = V_HIV,
+                      "CL" = CL_HIV,
+                      "KA" = KA_HIV
+                      )
+
+#Simulated dataset using your previously designed regimen
+HIV_simulated_df <- sim(ode = my_model,
+                       regimen = my_regimen,
+                       parameters = HIV_parameters,
+                       only_obs = T,
+                       output_include = list(variables=T),
+                       t_obs = seq(0,31*24,0.1)
+                       )
+
+#Plot the data
+ggplot(HIV_simulated_df, mapping=aes(x=t,y=y))+
+  geom_line()+
+  geom_hline(yintercept = tox_threshold)+
+  geom_hline(yintercept = eff_threshold)+
+  ylab("Concentration (mg/L)")+
+  xlab("Time (hr)")+
+  theme_bw()
+
+```
+
+### Can you design a new dosing regimen specifically for this subpopulation?
+```{r}
+
+#Let's design our new regimen, test different doses, times, and frequencies
+HIV_regimen = new_regimen(amt=1200, time=seq(0,28*24,4)) 
+
+#Simulated dataset using your newly designed regimen
+HIV_simulated_df_new <- sim(ode = my_model,
+                       regimen = HIV_regimen,
+                       parameters = HIV_parameters,
+                       only_obs = T,
+                       output_include = list(variables=T),
+                       t_obs = seq(0,31*24,0.1)
+                       )
+
+#Plot the data
+ggplot(HIV_simulated_df_new, mapping=aes(x=t,y=y))+
+  geom_line()+
+  geom_hline(yintercept = tox_threshold)+
+  geom_hline(yintercept = eff_threshold)+
+  ylab("Concentration (mg/L)")+
+  xlab("Time (hr)")+
+  theme_bw()
+
+# Did you need to increase or decrease the dose? How about frequency? Why do you think that is?
+# increase the dose, increase the frequency. This regimen was needed for HIV patients because of their higher CL, causing them to eliminate drug from their bodies faster.
+```
 
 ## Shortcuts
 ### Run an Rmd chunk all at once: CMD +SHIFT + RETURN
