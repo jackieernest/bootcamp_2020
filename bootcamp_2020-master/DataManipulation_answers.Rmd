@@ -44,7 +44,7 @@ library(ggplot2)
 
 # Loading your dataset
 ```{r}
-#setwd("~/Documents/Courses/Bootcamp/bootcamp_2020/")
+setwd("~/Documents/Courses/Bootcamp/bootcamp_2020/bootcamp_2020-master/")
 PKdata <- read.csv("simtab.csv")
 
 #Let's take a glimpse at your dataset
