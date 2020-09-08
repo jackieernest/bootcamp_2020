@@ -1,4 +1,4 @@
-
+library(tidyverse)
 library(xpose)
 
 # visualize simulated data
@@ -7,7 +7,7 @@ df <- read_nm_tables("sdtab01") #%>%
   #filter(EVID==0)
 
 
-ggplot(df, mapping=aes(x=TIME, y=IPRED, group=ID, color=factor(HIV)))+
+ggplot(df, mapping=aes(x=TIME, y=DV, group=ID, color=factor(HIV)))+
   geom_line()+
   facet_wrap(~DOSE)+
   scale_y_log10()+
@@ -24,6 +24,8 @@ simtab <- read.csv("../bootcamp_2020-master/simtab.csv")
 # add the new DVs to simtab.csv
 
 simtab$DV <- df$DV
+simtab$IPRED <- df$IPRED
 
-#write.csv(simtab, "../simtab.csv", row.names=F)
-#write.csv(simtab, "../bootcamp_2020-master/simtab.csv", row.names=F)
+# write.csv(simtab, "../simtab.csv", row.names=F)
+# write.csv(simtab, "../bootcamp_2020-master/simtab.csv", row.names=F)
+# write.csv(simtab, "~/Dropbox/apps/bootcamp_PK_app/simtab.csv", row.names=F)
