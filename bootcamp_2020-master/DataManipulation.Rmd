@@ -27,11 +27,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Installing and Loading packages
-```{r}
+```{r warning=F, message=F}
 #Comment out if you've already installed them
-install.packages("dplyr")
-install.packages("tidyr")
-install.packages("ggplot2")
+#install.packages("dplyr")
+#install.packages("tidyr")
+#install.packages("ggplot2")
 
 #Load libraries
 library(dplyr)
@@ -185,7 +185,7 @@ ggplot(DATA_GOES_HERE) +
 
 #Do you like lines better?
 ggplot(DATA_GOES_HERE) + 
- geom_line(aes(x=____,y=_____,group=factor(ID)),alpha = 0.1, linetype=2,size=0.1)
+ geom_line(aes(x=____,y=_____,group=factor(ID)),alpha = 0.5, linetype=2,size=0.1)
 
 #Let's put them on the same graph with a +
 
@@ -196,7 +196,7 @@ ggplot(DATA_GOES_HERE) +
 ```{r}
 ggplot(PKdata) + 
   geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) +
-  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.1, linetype=2,size=0.1)
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.5, linetype=2,size=0.1)
 ```
 
 ## Another way to stratify
@@ -204,7 +204,7 @@ ggplot(PKdata) +
 #It's still a little too cluttered
 ggplot(PKdata) + 
   geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) + 
-  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.1, linetype=2,size=0.1) +
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.5, linetype=2,size=0.1) +
   facet_wrap(.~DOSE)
 ```
 
@@ -215,7 +215,7 @@ ggplot(PKdata) +
 
 
 
-#Now let's try adding 2 stratifications: color by HIV and facet_wrap by Dose~SEX. Then try the other way around!
+#Now let's try adding 2 stratifications: color by HIV and facet_wrap by SEX~DOSE. Then try the other way around!
 
 
 
@@ -302,7 +302,7 @@ ggplot(DOSE_Med) +
 
 ```
 
-## This doesn't really work...the different dosing levels make the stratification cluttered
+## This doesn't work super well...the different dosing levels make the stratification cluttered
 ```{r}
 #We need to subset by DOSE and HIV
 #Prepare the dataset yourself
@@ -314,5 +314,12 @@ ggplot(YOUR_DATA_HERE) +
   geom_line(aes(x=TIME, y=median, color=as.factor(HIV))) +
   geom_ribbon(aes(x=TIME, ymin=lower, ymax=upper, fill=factor(HIV)), alpha=0.3) +
   facet_wrap(.~______)
+```
+
+
+## For next session, we will need to install PKPDsim
+```{r}
+library(devtools)
+install_github("ronkeizer/PKPDsim")
 ```
 

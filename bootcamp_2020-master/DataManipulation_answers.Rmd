@@ -44,7 +44,7 @@ library(ggplot2)
 
 # Loading your dataset
 ```{r}
-#setwd("~/Documents/Courses/Bootcamp/bootcamp_2020/")
+setwd("~/Documents/Courses/Bootcamp/bootcamp_2020/bootcamp_2020-master/")
 PKdata <- read.csv("simtab.csv")
 
 #Let's take a glimpse at your dataset
@@ -190,12 +190,12 @@ ggplot(PKdata) +
 
 #Do you like lines better?
 ggplot(PKdata) + 
- geom_line(aes(x=TIME, y=DV,group=factor(ID)),alpha = 0.1, linetype=2,size=0.1)
+ geom_line(aes(x=TIME, y=DV,group=factor(ID)),alpha = 0.5, linetype=2,size=0.1)
 
 #Let's put them on the same graph with a +
 
 ggplot(PKdata) + 
- geom_line(aes(x=TIME, y=DV,group=factor(ID)),alpha = 0.1, linetype=2,size=0.1) +
+ geom_line(aes(x=TIME, y=DV,group=factor(ID)),alpha = 0.5, linetype=2,size=0.1) +
   geom_point(aes(x=TIME, y=DV))
 
 ```
@@ -204,7 +204,7 @@ ggplot(PKdata) +
 ```{r}
 ggplot(PKdata) + 
   geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) + 
-  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.1, linetype=2,size=0.1)
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.5, linetype=2,size=0.1)
 ```
 
 ## Another way to stratify
@@ -212,7 +212,7 @@ ggplot(PKdata) +
 #It's still a little too cluttered
 ggplot(PKdata) + 
   geom_point(aes(x=TIME, y=DV, color = as.factor(DOSE))) + 
-  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.1, linetype=2,size=0.1) +
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(DOSE)),alpha = 0.5, linetype=2,size=0.1) +
   facet_wrap(.~DOSE)
 ```
 
@@ -221,22 +221,22 @@ ggplot(PKdata) +
 #Copy and paste from above, and let's plot stratified by HIV status
 ggplot(PKdata) + 
   geom_point(aes(x=TIME, y=DV, color = as.factor(HIV))) +
-  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(HIV)),alpha = 0.1, linetype=2,size=0.1) +
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(HIV)),alpha = 0.5, linetype=2,size=0.1) +
   facet_wrap(.~DOSE)
 ```
 
 ## Two stratifications
 ```{r}
-#Now let's try adding 2 stratifications: color by HIV and facet_wrap by Dose~SEX. Then try the other way around!
+#Now let's try adding 2 stratifications: color by HIV and facet_wrap by SEX~DOSE. Then try the other way around!
 ggplot(PKdata) + 
   geom_point(aes(x=TIME, y=DV, color = as.factor(HIV))) + 
-  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(HIV)),alpha = 0.1, linetype=2,size=0.1) +
-  facet_wrap(DOSE~SEX)
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(HIV)),alpha = 0.5, linetype=2,size=0.1) +
+  facet_wrap(SEX~DOSE)
 
 ggplot(PKdata) + 
   geom_point(aes(x=TIME, y=DV, color = as.factor(SEX))) +
-  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(SEX)),alpha = 0.1, linetype=2,size=0.1) +
-  facet_wrap(DOSE~~HIV)
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(SEX)),alpha = 0.5, linetype=2,size=0.1) +
+  facet_wrap(HIV~DOSE)
 
 #Challenge: Plot stratified by body weight, one color for above 45kg and another color for below. Make sure to have a legend :)
 #Hint: you will need to manipulate your dataframe
@@ -246,7 +246,7 @@ PKdata <- PKdata %>%
 
 ggplot(PKdata) + 
   geom_point(aes(x=TIME, y=DV, color = as.factor(WT_FLAG))) + 
-  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(WT_FLAG)),alpha = 0.1, linetype=2,size=0.1) +
+  geom_line(aes(x=TIME, y=DV, group=factor(ID), color = as.factor(WT_FLAG)),alpha = 0.5, linetype=2,size=0.1) +
   facet_wrap(.~DOSE)
 
 
@@ -264,7 +264,7 @@ Summary_stats <- PKdata %>%
             BW_upper = quantile(BW, probs = 0.975),
             BW_lower = quantile(BW, probs = 0.225))
 
-View(Summary_stats)
+Summary_stats
 
 ```
 
@@ -337,7 +337,7 @@ ggplot(HIV_Med) +
 
 ```
 
-## This doesn't really work...the different dosing levels make the stratification cluttered
+## This doesn't work super well...the different dosing levels make the stratification cluttered
 ```{r}
 #We need to subset by DOSE and HIV
 #Prepare the dataset yourself
