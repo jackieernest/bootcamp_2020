@@ -316,3 +316,10 @@ ggplot(YOUR_DATA_HERE) +
   facet_wrap(.~______)
 ```
 
+
+## For next session, we will need to install PKPDsim
+```{r}
+library(devtools)
+install_github("ronkeizer/PKPDsim")
+```
+
