@@ -1,5 +1,5 @@
 ---
-title: "PKPD concepts"
+title: "PSPG Bootcamp 2020: PK concepts"
 author: "Vincent Chang and Jackie Ernest"
 date: "`r Sys.Date()`"
 output:
@@ -25,8 +25,9 @@ output:
     -Simulate different scenarios by changing dose and frequency <br>
     
 <b> 4) Use PKPDsim to create your own model and simulations </b> <br>
-    -EXCERISE 1: rebuild your model
-    -EXERCISE 2: simulate alternate scenarios
+    -EXCERISE 1: rebuild your model                       <br>
+    -EXERCISE 2: simulate alternate scenarios             <br>
+    -EXERCISE 3: challenge!                                  <br>
 <br>
 <br>
 <b> PKPDsim documentation: </b> <br>
@@ -170,7 +171,7 @@ Can you find a regimen that keeps you in a therapeutic window that stays below t
 ```{r}
 
 tox_threshold <- 2.8 #mg/L
-eff_threshold <- 1.1 #mg/L
+eff_threshold <- 0.6 #mg/L
 
 ```
 
@@ -238,7 +239,7 @@ ggplot(my_simulated_df, mapping=aes(x=t,y=y))+
 ```
 
 
-## Challenge Exercise
+# EXERCISE 3: Challenge!
 You are told that HIV+ patients are not receiving therapeutic doses <br>
 Let's confirm that for ourselves..
 ```{r}
@@ -302,11 +303,11 @@ ggplot(HIV_simulated_df_new, mapping=aes(x=t,y=y))+
 # increase the dose, increase the frequency. This regimen was needed for HIV patients because of their higher CL, causing them to eliminate drug from their bodies faster.
 ```
 
-## Shortcuts
-### Run an Rmd chunk all at once: CMD +SHIFT + RETURN
-### Create a new Rmd chunk:    OPTION + CMD + I
-### Create a pipe (%>%) :        CMD + SHIFT + M
-### Create an arrow (<-) :       OPTION + dash (-)
-### To un/comment several lines at once: highlight lines + CMD + SHIFT + C
+# Shortcuts
+To run an Rmd chunk all at once: CMD +SHIFT + RETURN  <br>
+To create a new Rmd chunk:    OPTION + CMD + I        <br>
+To create a pipe (%>%) :        CMD + SHIFT + M       <br>
+To create an arrow (<-) :       OPTION + dash (-)      <br>
+To un/comment several lines at once: highlight lines + CMD + SHIFT + C
 
 

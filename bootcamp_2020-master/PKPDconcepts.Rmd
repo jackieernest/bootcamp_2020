@@ -1,5 +1,5 @@
 ---
-title: "PKPD concepts"
+title: "PSPG Bootcamp 2020: PK concepts"
 author: "Vincent Chang and Jackie Ernest"
 date: "`r Sys.Date()`"
 output:
@@ -25,8 +25,9 @@ output:
     -Simulate different scenarios by changing dose and frequency <br>
     
 <b> 4) Use PKPDsim to create your own model and simulations </b> <br>
-    -EXCERISE 1: rebuild your model
-    -EXERCISE 2: simulate alternate scenarios
+    -EXCERISE 1: rebuild your model                       <br>
+    -EXERCISE 2: simulate alternate scenarios             <br>
+    -EXERCISE 3: challenge!                                  <br>
 <br>
 <br>
 <b> PKPDsim documentation: </b> <br>
@@ -107,7 +108,7 @@ my_parameters <- list("V"  = V,
 # Let's input one single dose of 300 mg at time 0
 # Look up ?new_regimen to see arguments this function takes
 
-my_regimen <- new_regimen(_____, ____) 
+my_regimen <- new_regimen(amt=_____, times=____) 
 
 ```
 
@@ -141,10 +142,9 @@ ggplot()
 # does your plot look similar to your model in the Rshiny app?
 
 ```
+
+## Challenge: can you add the 300 mg dose data from simtab.csv to this plot?
 ```{r}
-
-# challenge: can you add the 300 mg dose data from simtab.csv to this plot?
-
 # step 1: read in dataset and filter for 300 mg data
 data <- read.csv("simtab.csv") %>%
   filter(DOSE==300)
@@ -167,7 +167,7 @@ Can you find a regimen that keeps you in a therapeutic window that stays below t
 ```{r}
 
 tox_threshold <- 2.8 #mg/L
-eff_threshold <- 1.1 #mg/L
+eff_threshold <- 0.6 #mg/L
 
 ```
 
@@ -222,9 +222,9 @@ ggplot()
 ```
 
 
-## Challenge Exercise
-## You are told that HIV+ patients are not receiving therapeutic doses
-## Let's confirm that for ourselves..
+# EXERCISE 3: Challenge!
+You are told that HIV+ patients are not receiving therapeutic doses <br>
+Let's confirm that for ourselves..
 ```{r}
 # Input your PK parameters for the HIV subpopulation that you derived from the Rshiny app here:
 
@@ -274,11 +274,11 @@ HIV_simulated_df_new <- sim(ode = my_model,
 
 ```
 
-## Shortcuts
-### Run an Rmd chunk all at once: CMD +SHIFT + RETURN
-### Create a new Rmd chunk:    OPTION + CMD + I
-### Create a pipe (%>%) :        CMD + SHIFT + M
-### Create an arrow (<-) :       OPTION + dash (-)
-### To un/comment several lines at once: highlight lines + CMD + SHIFT + C
+# Shortcuts
+Run an Rmd chunk all at once: CMD +SHIFT + RETURN
+Create a new Rmd chunk:    OPTION + CMD + I
+Create a pipe (%>%) :        CMD + SHIFT + M
+Create an arrow (<-) :       OPTION + dash (-)
+To un/comment several lines at once: highlight lines + CMD + SHIFT + C
 
 
